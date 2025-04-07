@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>블로그 글쓰기 봇</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 30px auto; padding: 20px; line-height: 1.6; }
+    label, input, textarea, button { display: block; width: 100%; margin-bottom: 15px; font-size: 16px; }
+    #output { white-space: pre-wrap; background: #f4f4f4; padding: 20px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h2>📝 네이버 블로그 글쓰기 봇</h2>
+
+  <label for="keyword">메인 키워드</label>
+  <input id="keyword" placeholder="예: 멜라닌케어">
+
+  <label for="topic">주제</label>
+  <textarea id="topic" rows="3" placeholder="예: 기미 잡티를 줄이기 위한 홈케어 방법"></textarea>
+
+  <button onclick="generateBlog()">✍ 글쓰기 시작</button>
+
+  <div id="output"></div>
+
+  <script>
+    async function generateBlog() {
+      const keyword = document.getElementById("keyword").value.trim();
+      const topic = document.getElementById("topic").value.trim();
+      const output = document.getElementById("output");
+
+      if (!keyword || !topic) {
+        alert("메인 키워드와 주제를 모두 입력해주세요.");
+        return;
+      }
+
+      const prompt = `
+너는 블로그 전문 작가야.
+다음 조건에 맞게 글을 써줘.
+
+- 주제: ${topic}
+- 메인 키워드: ${keyword}
+- 글자 수는 4000자 이상
+- 한 줄에 40자 이내로 줄바꿈
+- 총 5개의 소주제로 구성
+- 구조: 제목 / 소주제1 / 내용 / 소주제2 / 내용 ... 소주제5 / 내용 / 마무리 인사
+
+블로그 스타일로 자연스럽고 읽기 쉽게 써줘.
+`;
+
+      // 실제 OpenAI 호출: 나중에 프록시 서버 만들고 연결할 부분
+      const res = await fetch("YOUR_PROXY_ENDPOINT", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+
+      const data = await res.json();
+      const blogText = data.choices?.[0]?.message?.content || "결과를 불러오지 못했어요.";
+
+      output.innerText = blogText;
+    }
+  </script>
+</body>
+</html>
