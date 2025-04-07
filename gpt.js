@@ -1,54 +1,7 @@
-const templates = {
-  compare_review: `1. 문제 제기 (예: 어떤 \${keyword} 브랜드를 선택해야 할까?)
-2. 비교 기준 설정 (예: 가격, 기술력, 후기 만족도)
-3. 브랜드 A vs 브랜드 B 비교
-4. 실제 내가 선택한 브랜드 후기
-5. 시술 과정 설명
-6. 시술 후 변화와 느낌
-7. 최종 추천
-8. 상담/문의 행동 유도`,
-
-  info_review_compare: `1. 주제 소개 및 기본 정보 설명 (예: \${keyword}란?)
-2. 필요성 설명
-3. 여러 브랜드/업체 비교 분석
-4. 체험 및 후기 작성
-5. 시술 전후 변화 설명
-6. 주의사항 또는 관리 방법
-7. 결론 및 추천
-8. 상담/문의 행동 유도`,
-
-  story_review: `1. 나의 고민 이야기 (예: \${keyword}로 인한 문제)
-2. 해결 방법을 찾던 과정
-3. 시술 결심 이유
-4. 시술 경험 상세 기록
-5. 시술 후 외모와 심리 변화
-6. 주변 반응과 실제 후기
-7. 현재 삶과 추천 메시지
-8. 상담/문의 행동 유도`,
-
-  authority_info: `1. 자기소개 및 경력/자격 소개
-2. \${keyword}의 필요성 설명 (전문가 입장에서)
-3. 과정 설명
-4. 기술/서비스 차별성 설명
-5. 고객 만족 후기 인용
-6. 관리 방법과 주의사항 안내
-7. 브랜드 신뢰 강조
-8. 상담/문의 행동 유도`,
-
-  experience_review_info: `1. 체험단 선정 이야기
-2. 시술 전 상태 설명
-3. 시술 과정 상세 기록
-4. 시술 후 변화 및 실사용 후기
-5. 장단점 솔직 정리
-6. 추천 대상 설명
-7. 최종 결론 및 소감
-8. 상담/문의 행동 유도`
-};
-
 const form = document.getElementById('blogForm');
 const output = document.getElementById('output');
 
-form.addEventListener('submit', function(event) {
+form.addEventListener('submit', async function(event) {
   event.preventDefault();
 
   const combination = document.getElementById('combination').value;
@@ -58,7 +11,38 @@ form.addEventListener('submit', function(event) {
     return;
   }
 
-  const template = templates[combination];
-  const filledTemplate = template.replace(/\${keyword}/g, keywordInput);
-  output.textContent = filledTemplate;
+  // GPT에게 보낼 프롬프트 구성
+  const prompt = `당신은 블로그 글 전문 작가입니다.
+선택된 조합은 "${combination}"이고, 주제 키워드는 "${keywordInput}"입니다.
+아래 조건에 따라 글을 작성해주세요:
+
+- 분량: 4000자 이상
+- 구성: 제목, 소주제1 + 본문, ... 소주제5 + 본문, 마무리
+- 자연스럽고 풍부하게
+- 문단마다 한 줄에 40자 이내로 자동 줄바꿈 고려
+
+이 조건에 맞게 글을 작성해주세요.`;
+
+  output.textContent = "GPT에게 요청 중입니다...";
+
+  try {
+    const response = await fetch("https://your-vercel-app.vercel.app/api/gpt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    if (data.choices && data.choices[0]?.message?.content) {
+      output.textContent = data.choices[0].message.content;
+    } else {
+      output.textContent = "GPT 응답을 받지 못했습니다.";
+    }
+  } catch (error) {
+    console.error("에러:", error);
+    output.textContent = "요청 중 오류가 발생했습니다.";
+  }
 });
