@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>블로그 글쓰기 조합 봇</title>
+</head>
+<body>
+  <h1>블로그 글쓰기 조합 봇</h1>
+
+  <form id="blogForm">
+    <label for="combination">조합 선택:</label>
+    <select id="combination">
+      <option value="compare_review">비교 분석형 + 후기성</option>
+      <option value="info_review_compare">정보성 + 후기성 + 비교 분석형</option>
+      <option value="story_review">스토리텔링 + 후기성</option>
+      <option value="authority_info">권위 있는 글 + 정보성</option>
+      <option value="experience_review_info">체험단 + 후기성 + 정보성</option>
+    </select>
+    <br><br>
+
+    <label for="keyword">키워드 입력:</label>
+    <input type="text" id="keyword" placeholder="예: 두피문신 후기">
+    <br><br>
+
+    <button type="submit">글 양식 생성하기</button>
+  </form>
+
+  <h2>생성된 블로그 글 양식</h2>
+  <div id="output" style="white-space: pre-wrap; margin-top: 20px; border: 1px solid #ccc; padding: 20px;"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
